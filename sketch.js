@@ -18,12 +18,11 @@ let randomValZ = 0;
 let randomValY = 0;
 let xPosBoxFall = 0;
 
-let deathCount = 0;
-
 let maxXPos = 400; //Afstand to beginning (red-plane)
 
 //Gameplay variables
 let time = 0;
+let deathCount = 0;
 let boxCurrentXpos = [0,0,0];   //Change this for each square :(
 let saveThisValue = [[],[],[]];  //Change this for each square :(
 
@@ -38,33 +37,24 @@ function draw()
   background(220);
 
   boxSpeed += 0.02; //Increase speed of box
-  time+= 1/30;
+  time+= 1/30; //Going to use later on!
 
 
   //Caculating distance from cam to box
-    // box X pos = (boxStartOffset-xPosBoxFall) | box Y pos = randomValY | boxZpos = randomValZ
+  for (let i = 0; i < boxCurrentXpos.length; i++)
+  {
+    let camPosXDiff = abs(camX - (boxStartOffset - boxCurrentXpos[i]));
+    let camPosYDiff = abs(abs(camY) - abs(saveThisValue[i][1]));
+    let camPosZDiff = abs(abs(camZ) - abs(saveThisValue[i][2]));
   
-  //Apparently Dosent work yet
-    for (let i = 0; i>boxCurrentXpos.length; i++){
-      print("\nY:  " + round(saveThisValue[i][1]) + " -> " + round(camY) + "  |   Z:  " + round(saveThisValue[i][2]) + " -> " + round(camZ));
-
-      if(abs(camX - (boxStartOffset-xPosBoxFall)) < boxSize/2)
-      {
-        if(abs(abs(camY) - abs(saveThisValue[i][1])) < boxSize/2)
-        {
-          if(abs(abs(camZ) - abs(saveThisValue[i][2])) < boxSize/2)
-          {
-            print("DIED " + (deathCount+1));
-            deathCount++;
-            noLoop();
-          }
-        }
-      }
+    if (camPosXDiff < boxSize/2 && camPosYDiff < boxSize/2 && camPosZDiff < boxSize/2)
+    {
+      print("DIED " + (deathCount+1));
+      deathCount++;
+    }
   }
   
-  //Add this into for loop to check for each square
-  
-  
+
   //Drawing all planes
   /*Red*/       createPlane(transX = 400, transY = 0,    transZ= 0,    rotX = 0,   rotY = 90,  rotZ = 0, planeSize = 400,  fillR = 255,  fillG = 0,    fillB = 0);
   /*Green*/     createPlane(transX = 200, transY = 0,    transZ= 200,  rotX = 0,   rotY = 0,   rotZ = 0, planeSize = 2000, fillR = 0,    fillG = 255,  fillB = 0);
@@ -72,23 +62,28 @@ function draw()
   /*Yellow*/    createPlane(transX = 200, transY = 200,  transZ= 0,    rotX = 90,  rotY = 0,   rotZ = 0, planeSize = 2000, fillR = 255,  fillG = 255,  fillB = 0);
   /*LightBlue*/ createPlane(transX = 200, transY = -200, transZ= 0,    rotX = 90,  rotY = 0,   rotZ = 0, planeSize = 2000, fillR = 0,    fillG = 255,  fillB = 255);
 
+
+  //Handling  movement
   StayInside(maxXPos,150,150); //Can't move outside the planes
   WASD(); //Move with WASD
   Rotate(); //Rotate with arrow
   UpDown(); //Go up and down with shift and space
   
-  
+
+  //camera pos/view/rot
   camera(camX, camY, camZ, 
          camX + cos(angleY) * cos(angleX), camY + sin(angleX), camZ + sin(angleY) * cos(angleX), 
          0, 1, 0);
 
-  //Create boxes
+  //Create boxes | arrayVal1 has to be different for each box
   CreateBox(boxTranslateY = 200, boxTranslateZ = 200, boxRandomValY = offsetY,boxRandomValZ = offsetZ, arrayVal1 =0);
   CreateBox(boxTranslateY = 200, boxTranslateZ = 200, boxRandomValY = offsetY,boxRandomValZ = offsetZ, arrayVal1 =1);
   CreateBox(boxTranslateY = 200, boxTranslateZ = 200, boxRandomValY = offsetY,boxRandomValZ = offsetZ, arrayVal1 =2);
 }
-function CreateBox(boxTranslateY,boxTranslateZ, boxRandomValY, boxRandomValZ, arrayVal1){
-  if(boxCurrentXpos[arrayVal1] > (maxXPos + boxStartOffset)){
+function CreateBox(boxTranslateY,boxTranslateZ, boxRandomValY, boxRandomValZ, arrayVal1)
+{
+  if(boxCurrentXpos[arrayVal1] > (maxXPos + boxStartOffset))
+  {
     boxCurrentXpos[arrayVal1] = 0;
 
     boxTranslateY = random(-boxRandomValY,boxRandomValY);
@@ -96,7 +91,9 @@ function CreateBox(boxTranslateY,boxTranslateZ, boxRandomValY, boxRandomValZ, ar
 
     saveThisValue[arrayVal1][1] = boxTranslateY;
     saveThisValue[arrayVal1][2] = boxTranslateZ;
-  } else {
+  } 
+  else 
+  {
 
     boxCurrentXpos[arrayVal1]+=boxSpeed;
   }
