@@ -8,20 +8,24 @@ let angleX = 0;
 let angleY = 0;
 
 //Variables for box
+let boxSpeed = 20;
+let boxSize = 50;
+
 let boxStartOffset = 500; //How far away the box spawns
-let offsetZ = 200;
-let offsetY = 200;
+let offsetZ = 200-boxSize/2;
+let offsetY = 200-boxSize/2;
 let randomValZ = 0;
 let randomValY = 0;
 let xPosBoxFall = 0;
-let boxSpeed = 20;
-let boxSize = 50;
+
 let deathCount = 0;
 
 let maxXPos = 400; //Afstand to beginning (red-plane)
 
 //Gameplay variables
 let time = 0;
+let boxCurrentXpos = [0,0,0];   //Change this for each square :(
+let saveThisValue = [[],[],[]];  //Change this for each square :(
 
 function setup() 
 {
@@ -32,30 +36,34 @@ function setup()
 function draw() 
 {
   background(220);
-  
-  //Translate Box
-  CreateBox2();
 
   boxSpeed += 0.02; //Increase speed of box
   time+= 1/30;
-  print("BoxSpeed: " + round(boxSpeed) + "   time: " + round(time));
-  
-  //CreateBox(boxSize1 = 50, boxSpeed1 = 20 ,boxOffsetY = 200, boxOffsetZ = 200,boxCurrentXPos = 0,boxMaxXPos = 400,boxRandomValY = 0,boxRandomValZ = 0);
 
 
   //Caculating distance from cam to box
-    // boxXpos = (boxStartOffset-xPosBoxFall) | boxYpos = randomValY | boxZpos = randomValZ
-  if(abs(camX - (boxStartOffset-xPosBoxFall)) < boxSize/2)
-  {
-    if(abs(camY - randomValY) < boxSize/2)
-    {
-      if(abs(camZ - randomValZ) < boxSize/2)
+    // box X pos = (boxStartOffset-xPosBoxFall) | box Y pos = randomValY | boxZpos = randomValZ
+  
+  //Apparently Dosent work yet
+    for (let i = 0; i>boxCurrentXpos.length; i++){
+      print("\nY:  " + round(saveThisValue[i][1]) + " -> " + round(camY) + "  |   Z:  " + round(saveThisValue[i][2]) + " -> " + round(camZ));
+
+      if(abs(camX - (boxStartOffset-xPosBoxFall)) < boxSize/2)
       {
-        print("DIED " + (deathCount+1));
-        deathCount++;
+        if(abs(abs(camY) - abs(saveThisValue[i][1])) < boxSize/2)
+        {
+          if(abs(abs(camZ) - abs(saveThisValue[i][2])) < boxSize/2)
+          {
+            print("DIED " + (deathCount+1));
+            deathCount++;
+            noLoop();
+          }
+        }
       }
-    }
   }
+  
+  //Add this into for loop to check for each square
+  
   
   //Drawing all planes
   /*Red*/       createPlane(transX = 400, transY = 0,    transZ= 0,    rotX = 0,   rotY = 90,  rotZ = 0, planeSize = 400,  fillR = 255,  fillG = 0,    fillB = 0);
@@ -73,35 +81,36 @@ function draw()
   camera(camX, camY, camZ, 
          camX + cos(angleY) * cos(angleX), camY + sin(angleX), camZ + sin(angleY) * cos(angleX), 
          0, 1, 0);
-}
-function CreateBox2()
-{
-  if (xPosBoxFall>maxXPos+boxStartOffset){
-    xPosBoxFall = 0;
-    randomValZ = random(-offsetZ,offsetZ);
-    randomValY = random(-offsetY,offsetY);
-  }else xPosBoxFall +=boxSpeed;
 
+  //Create boxes
+  CreateBox(boxTranslateY = 200, boxTranslateZ = 200, boxRandomValY = offsetY,boxRandomValZ = offsetZ, arrayVal1 =0);
+  CreateBox(boxTranslateY = 200, boxTranslateZ = 200, boxRandomValY = offsetY,boxRandomValZ = offsetZ, arrayVal1 =1);
+  CreateBox(boxTranslateY = 200, boxTranslateZ = 200, boxRandomValY = offsetY,boxRandomValZ = offsetZ, arrayVal1 =2);
+}
+function CreateBox(boxTranslateY,boxTranslateZ, boxRandomValY, boxRandomValZ, arrayVal1){
+  if(boxCurrentXpos[arrayVal1] > (maxXPos + boxStartOffset)){
+    boxCurrentXpos[arrayVal1] = 0;
+
+    boxTranslateY = random(-boxRandomValY,boxRandomValY);
+    boxTranslateZ = random(-boxRandomValZ,boxRandomValZ);
+
+    saveThisValue[arrayVal1][1] = boxTranslateY;
+    saveThisValue[arrayVal1][2] = boxTranslateZ;
+  } else {
+
+    boxCurrentXpos[arrayVal1]+=boxSpeed;
+  }
+  
+  TranslateBox(boxStartOffset-boxCurrentXpos[arrayVal1],saveThisValue[arrayVal1][1],saveThisValue[arrayVal1][2]);
+}
+
+function TranslateBox(TranslateX,TranslateY,TranslateZ)
+{
   push();
-  translate(boxStartOffset-xPosBoxFall, randomValY, randomValZ);
-  fill(255,255,0);
+  translate(TranslateX,TranslateY,TranslateZ);
   box(boxSize);
   pop();
-}
 
-function CreateBox(boxSize1,boxSpeed1,boxOffsetY, boxOffsetZ,boxCurrentXPos,boxMaxXPos,boxRandomValY,boxRandomValZ)
-{
-  if(boxCurrentXPos>boxMaxXPos){
-    boxCurrentXPos = 0;
-    boxRandomValY = random(-boxOffsetY,boxOffsetY);
-    boxRandomValZ = random(-boxOffsetZ,boxOffsetZ);
-  }else boxCurrentXPos +=boxSpeed1;
-
-  push();
-  translate(boxStartOffset-boxCurrentXPos,boxRandomValY,boxRandomValZ);
-  fill(255,255,0);
-  box(boxSize1);
-  pop();
 }
 
 function StayInside(maxX, maxY, maxZ)
