@@ -1,5 +1,4 @@
 //Variables for movement
-
 let moveSpeed = 15;
 let rotSpeed = 3;
 let camX = 0;
@@ -9,7 +8,7 @@ let angleX = 0;
 let angleY = 0;
 
 //Variables for box
-let boxStartOffset = 500;
+let boxStartOffset = 500; //How far away the box spawns
 let offsetZ = 200;
 let offsetY = 200;
 let randomValZ = 0;
@@ -19,39 +18,33 @@ let boxSpeed = 20;
 let boxSize = 50;
 let deathCount = 0;
 
-
 let maxXPos = 400; //Afstand to beginning (red-plane)
 
+//Gameplay variables
+let time = 0;
 
-
-
-function setup() {
+function setup() 
+{
   createCanvas(400, 400, WEBGL);
   angleMode(DEGREES);
 }
 
-function draw() {
+function draw() 
+{
   background(220);
   
   //Translate Box
+  CreateBox2();
+
+  boxSpeed += 0.02; //Increase speed of box
+  time+= 1/30;
+  print("BoxSpeed: " + round(boxSpeed) + "   time: " + round(time));
   
   //CreateBox(boxSize1 = 50, boxSpeed1 = 20 ,boxOffsetY = 200, boxOffsetZ = 200,boxCurrentXPos = 0,boxMaxXPos = 400,boxRandomValY = 0,boxRandomValZ = 0);
-  
-  if (xPosBoxFall>maxXPos+boxStartOffset){
-    xPosBoxFall = 0;
-    randomValZ = random(-offsetZ,offsetZ);
-    randomValY = random(-offsetY,offsetY);
-  }else xPosBoxFall +=boxSpeed;
-
-  push();
-  translate(boxStartOffset-xPosBoxFall, randomValY, randomValZ);
-  fill(255,255,0);
-  box(boxSize);
-  pop();
-  
 
 
   //Caculating distance from cam to box
+    // boxXpos = (boxStartOffset-xPosBoxFall) | boxYpos = randomValY | boxZpos = randomValZ
   if(abs(camX - (boxStartOffset-xPosBoxFall)) < boxSize/2)
   {
     if(abs(camY - randomValY) < boxSize/2)
@@ -64,24 +57,40 @@ function draw() {
     }
   }
   
-  /*Red*/       createPlane(transX = 400,transY = 0,transZ= 0, rotX = 0, rotY = 90, rotZ = 0, planeSize = 400, fillR = 255, fillG = 0, fillB = 0);
-  /*Green*/     createPlane(transX = 200,transY = 0,transZ= 200, rotX = 0, rotY = 0, rotZ = 0, planeSize = 2000, fillR = 0, fillG = 255, fillB = 0);
-  /*Dark Blue*/ createPlane(transX = 200,transY = 0,transZ= -200, rotX = 0, rotY = 0, rotZ = 0, planeSize = 2000, fillR = 0, fillG = 0, fillB = 255);
-  /*Yellow*/    createPlane(transX = 200,transY = 200,transZ= 0, rotX = 90, rotY = 0, rotZ = 0, planeSize = 2000, fillR = 255, fillG = 255, fillB = 0);
-  /*LightBlue*/ createPlane(transX = 200,transY = -200,transZ= 0, rotX = 90, rotY = 0, rotZ = 0, planeSize = 2000, fillR = 0, fillG = 255, fillB = 255);
+  //Drawing all planes
+  /*Red*/       createPlane(transX = 400, transY = 0,    transZ= 0,    rotX = 0,   rotY = 90,  rotZ = 0, planeSize = 400,  fillR = 255,  fillG = 0,    fillB = 0);
+  /*Green*/     createPlane(transX = 200, transY = 0,    transZ= 200,  rotX = 0,   rotY = 0,   rotZ = 0, planeSize = 2000, fillR = 0,    fillG = 255,  fillB = 0);
+  /*Dark Blue*/ createPlane(transX = 200, transY = 0,    transZ= -200, rotX = 0,   rotY = 0,   rotZ = 0, planeSize = 2000, fillR = 0,    fillG = 0,    fillB = 255);
+  /*Yellow*/    createPlane(transX = 200, transY = 200,  transZ= 0,    rotX = 90,  rotY = 0,   rotZ = 0, planeSize = 2000, fillR = 255,  fillG = 255,  fillB = 0);
+  /*LightBlue*/ createPlane(transX = 200, transY = -200, transZ= 0,    rotX = 90,  rotY = 0,   rotZ = 0, planeSize = 2000, fillR = 0,    fillG = 255,  fillB = 255);
 
-  StayInside(maxXPos,150,150);
-  WASD();
-  Rotate();
-  UpDown();
+  StayInside(maxXPos,150,150); //Can't move outside the planes
+  WASD(); //Move with WASD
+  Rotate(); //Rotate with arrow
+  UpDown(); //Go up and down with shift and space
   
   
   camera(camX, camY, camZ, 
          camX + cos(angleY) * cos(angleX), camY + sin(angleX), camZ + sin(angleY) * cos(angleX), 
          0, 1, 0);
 }
+function CreateBox2()
+{
+  if (xPosBoxFall>maxXPos+boxStartOffset){
+    xPosBoxFall = 0;
+    randomValZ = random(-offsetZ,offsetZ);
+    randomValY = random(-offsetY,offsetY);
+  }else xPosBoxFall +=boxSpeed;
 
-function CreateBox(boxSize1,boxSpeed1,boxOffsetY, boxOffsetZ,boxCurrentXPos,boxMaxXPos,boxRandomValY,boxRandomValZ){
+  push();
+  translate(boxStartOffset-xPosBoxFall, randomValY, randomValZ);
+  fill(255,255,0);
+  box(boxSize);
+  pop();
+}
+
+function CreateBox(boxSize1,boxSpeed1,boxOffsetY, boxOffsetZ,boxCurrentXPos,boxMaxXPos,boxRandomValY,boxRandomValZ)
+{
   if(boxCurrentXPos>boxMaxXPos){
     boxCurrentXPos = 0;
     boxRandomValY = random(-boxOffsetY,boxOffsetY);
@@ -95,11 +104,12 @@ function CreateBox(boxSize1,boxSpeed1,boxOffsetY, boxOffsetZ,boxCurrentXPos,boxM
   pop();
 }
 
-function StayInside(maxX, maxY, maxZ){
+function StayInside(maxX, maxY, maxZ)
+{
   if( camX>maxX){
     camX = maxX;
   }
-  else if(camX<maxX){ //change this to camX<-maxX (if you want to move forward (dosent work))
+  else if(camX<maxX){ //change this to camX<-maxX (if you want to move forward)
     camX=-maxX;
   }
 
@@ -118,7 +128,8 @@ function StayInside(maxX, maxY, maxZ){
   }
 
 }
-function createPlane(transX = 0,transY = 0,transZ= 0, rotX = 0, rotY = 0, rotZ = 0, planeSize = 400, fillR = 0, fillG = 0, fillB = 0){
+function createPlane(transX = 0,transY = 0,transZ= 0, rotX = 0, rotY = 0, rotZ = 0, planeSize = 400, fillR = 0, fillG = 0, fillB = 0)
+{
   push();
   noStroke();
   fill(fillR,fillG,fillB);
@@ -131,7 +142,8 @@ function createPlane(transX = 0,transY = 0,transZ= 0, rotX = 0, rotY = 0, rotZ =
   pop();
 }
 
-function WASD(){
+function WASD()
+{
   if (keyIsDown(87)) // W key
   { 
     camX += moveSpeed * cos(angleY);
@@ -153,7 +165,8 @@ function WASD(){
     camZ += moveSpeed * sin(angleY + 90);
   }
 }
-function Rotate(){
+function Rotate()
+{
   if (keyIsDown(UP_ARROW)) 
   {
     angleX -= rotSpeed;
@@ -171,7 +184,8 @@ function Rotate(){
     angleY += rotSpeed;
   }  
 }
-function UpDown(){
+function UpDown()
+{
   if (keyIsDown(32)) // Space key
   { 
     camY -= moveSpeed;
@@ -181,4 +195,3 @@ function UpDown(){
     camY += moveSpeed;
   }
 }
-
