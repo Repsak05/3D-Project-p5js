@@ -32,6 +32,8 @@ function setup()
   angleMode(DEGREES);
 }
 
+
+
 function draw() 
 {
   background(220);
@@ -80,6 +82,7 @@ function draw()
   CreateBox(boxTranslateY = 200, boxTranslateZ = 200, boxRandomValY = offsetY,boxRandomValZ = offsetZ, arrayVal1 =1);
   CreateBox(boxTranslateY = 200, boxTranslateZ = 200, boxRandomValY = offsetY,boxRandomValZ = offsetZ, arrayVal1 =2);
 }
+
 function CreateBox(boxTranslateY,boxTranslateZ, boxRandomValY, boxRandomValZ, arrayVal1)
 {
   if(boxCurrentXpos[arrayVal1] > (maxXPos + boxStartOffset))
@@ -115,7 +118,7 @@ function StayInside(maxX, maxY, maxZ)
   if( camX>maxX){
     camX = maxX;
   }
-  else if(camX<maxX){ //change this to camX<-maxX (if you want to move forward)
+  else if(camX<-maxX){ //change this to camX<-maxX (if you want to move forward)
     camX=-maxX;
   }
 
